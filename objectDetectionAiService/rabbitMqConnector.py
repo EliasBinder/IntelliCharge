@@ -9,6 +9,7 @@ channel = connection.channel()
 channel.exchange_declare(exchange='images', exchange_type='fanout')
 
 def callback(ch, method, props, body):
+    body = body.decode()
     print(" [x] Received %r" % body)
     predictionObject = predict(body)
     predictionFace = detect(body)
@@ -19,7 +20,5 @@ def callback(ch, method, props, body):
             channel.basic_publish(exchange='', routing_key='image_face', body=face)
 
 
-channel.basic_consume(queue='images', auto_ack=False, on_message_callback=callback)
-
-while True:
-    pass
+channel.basic_consume(queue='images', auto_ack=True, on_message_callback=callback)
+channel.start_consuming()
