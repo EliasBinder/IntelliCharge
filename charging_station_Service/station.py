@@ -115,3 +115,7 @@ queue_name = result.method.queue
 channel.queue_bind(exchange='plate_detected', queue=queue_name)
 channel.basic_consume(queue=queue_name, auto_ack=True, on_message_callback=vehicle_can_enter_obs)
 channel.start_consuming()
+
+#open_barrier_and_signal_enter()
+#for i in range(5):
+#    not_allowed_to_enter()
