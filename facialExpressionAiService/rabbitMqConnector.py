@@ -14,5 +14,7 @@ def callback(ch, method, props, body):
     channel.basic_publish(exchange='', routing_key='events', body=prediction)
 
 
+channel.basic_consume(queue='image_face', auto_ack=False, on_message_callback=callback)
+
 while True:
-    channel.basic_consume(queue='image_face', auto_ack=True, on_message_callback=callback)
+    pass
