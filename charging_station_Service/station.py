@@ -7,21 +7,21 @@ from gpiozero import AngularServo
 import pika
 
 # Define the number of leftStrip in the strip
-NUM_PIXELS = 34
+NUM_PIXELS = 17
 
 # Initialize the neopixel strip
 leftStrip = neopixel.NeoPixel(board.D18, NUM_PIXELS)
 factory = PiGPIOFactory()
 servo = AngularServo(17, min_angle=-90, max_angle=90, pin_factory=factory)
-
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+credentials = pika.PlainCredentials('admin', 'admin')
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.94.1', credentials=credentials))
 channel = connection.channel()
 
 def enter_spot():
     for i in range(NUM_PIXELS - 4 + 1):
         leftStrip.fill((0,0,0))
         for j in range(4):
-            leftStrip[i+j] = (0,0,255)
+            leftStrip[NUM_PIXELS - i - j - 1] = (0,0,255)
         time.sleep(0.1)
 
 # Define a function to animate the strip
@@ -65,8 +65,8 @@ def open_barrier():
 def close_barrier():
     servo.angle = -90
 
-def open_barrier_and_signal_enter(ch, method, properties, body):
-    print(" [x] Received %r" % body)
+def open_barrier_and_signal_enter(): #def open_barrier_and_signal_enter(ch, method, properties, body):
+    #print(" [x] Received %r" % body)
     open_barrier()
     time.sleep(1)
     for i in range(5):
@@ -74,6 +74,8 @@ def open_barrier_and_signal_enter(ch, method, properties, body):
     time.sleep(1)
     turn_off_leds()
     close_barrier
+    channel.queue_declare(queue='charging_started')
+    channel.basic_publish(exchange='', routing_key='charging_started', body='Charging has started.')
     for i in range(5):
         charging_anim()
     time.sleep(1)
@@ -91,11 +93,6 @@ def open_barrier_and_signal_enter(ch, method, properties, body):
     turn_off_leds()
     time.sleep(1)
 
-channel.basic_consume(queue='vehicle_can_enter', auto_ack=True, on_message_callback=open_barrier_and_signal_enter)
+##channel.basic_consume(queue='vehicle_can_enter', auto_ack=True, on_message_callback=open_barrier_and_signal_enter)
 
-time.sleep(1)
-close_barrier()
-for i in range(3):
-    charging_anim()
-time.sleep(1)
-done_charging()
+open_barrier_and_signal_enter()
