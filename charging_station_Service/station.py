@@ -16,6 +16,7 @@ servo = AngularServo(17, min_angle=-90, max_angle=90, pin_factory=factory)
 credentials = pika.PlainCredentials('admin', 'admin')
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.94.1', credentials=credentials))
 channel = connection.channel()
+channel.exchange_declare(exchange='vehicle_can_enter', exchange_type='fanout')
 
 def enter_spot():
     for i in range(NUM_PIXELS - 4 + 1):
@@ -65,34 +66,39 @@ def open_barrier():
 def close_barrier():
     servo.angle = -90
 
-def open_barrier_and_signal_enter(): #def open_barrier_and_signal_enter(ch, method, properties, body):
-    #print(" [x] Received %r" % body)
+def open_barrier_and_signal_enter(ch, method, properties, body):
+    print(" [x] Received %r" % body)
     open_barrier()
     time.sleep(1)
     for i in range(5):
         enter_spot()
     time.sleep(1)
     turn_off_leds()
-    close_barrier
+    close_barrier()
     channel.queue_declare(queue='charging_started')
+    time.sleep(1)
     channel.basic_publish(exchange='', routing_key='charging_started', body='Charging has started.')
     for i in range(5):
         charging_anim()
     time.sleep(1)
     turn_off_leds()
     channel.queue_declare(queue='charging_completed')
+    time.sleep(1)
     channel.basic_publish(exchange='', routing_key='charging_completed', body='Charging was successfully completed.')
     for i in range(3):
         done_charging()
     turn_off_leds()
     time.sleep(1)
     channel.queue_declare(queue='vehicle_abusive')
+    time.sleep(1)
     channel.basic_publish(exchange='', routing_key='vehicle_abusive', body='Charging is done and vehicle is stationary for too long.')
     for i in range(3):
         not_allowed_to_enter()
     turn_off_leds()
-    time.sleep(1)
+    time.sleep(1000)
 
-##channel.basic_consume(queue='vehicle_can_enter', auto_ack=True, on_message_callback=open_barrier_and_signal_enter)
-
-open_barrier_and_signal_enter()
+result = channel.queue_declare(queue='', exclusive=True)
+queue_name = result.method.queue
+channel.queue_bind(exchange='vehicle_can_enter', queue=queue_name)
+channel.basic_consume(queue=queue_name, auto_ack=True, on_message_callback=open_barrier_and_signal_enter)
+channel.start_consuming()
