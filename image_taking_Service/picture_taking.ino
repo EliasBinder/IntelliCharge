@@ -7,14 +7,14 @@
 // Define the camera module
 #define CAMERA_MODEL_AI_THINKER
 
-const char* ssid = "your-ssid";
-const char* password = "your-password";
+const char* ssid = "Sciaco router";
+const char* password = "12345678";
 
-const char* rabbitMQServer = "your-rabbitmq-server";
-const int rabbitMQPort = 5672;
-const char* rabbitMQUser = "your-rabbitmq-user";
-const char* rabbitMQPassword = "your-rabbitmq-password";
-const char* rabbitMQQueue = "car_image";
+const char* rabbitMQServer = "192.168.94.1";
+const int rabbitMQPort = 15672;
+const char* rabbitMQUser = "admin";
+const char* rabbitMQPassword = "admin";
+const char* rabbitMQQueue = "car_images";
 
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
@@ -103,8 +103,8 @@ void connectToRabbitMQ() {
     if (client.connect("ESP32-CAM", rabbitMQUser, rabbitMQPassword)) {
       Serial.println("Connected to RabbitMQ");
     } else {
-      Serial.println("Connection to RabbitMQ failed, retrying in 5 seconds...");
-      delay(5000);
+      Serial.println("Connection to RabbitMQ failed, retrying in 1 second...");
+      delay(1000);
     }
   }
 }

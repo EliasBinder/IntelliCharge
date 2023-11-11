@@ -16,7 +16,7 @@ servo = AngularServo(17, min_angle=-90, max_angle=90, pin_factory=factory)
 credentials = pika.PlainCredentials('admin', 'admin')
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.94.1', credentials=credentials))
 channel = connection.channel()
-channel.exchange_declare(exchange='vehicle_can_enter', exchange_type='fanout')
+channel.exchange_declare(exchange='plate_detected', exchange_type='fanout')
 
 def enter_spot():
     for i in range(NUM_PIXELS - 4 + 1):
@@ -66,8 +66,7 @@ def open_barrier():
 def close_barrier():
     servo.angle = -90
 
-def open_barrier_and_signal_enter(ch, method, properties, body):
-    print(" [x] Received %r" % body)
+def open_barrier_and_signal_enter():
     open_barrier()
     time.sleep(1)
     for i in range(5):
@@ -97,8 +96,22 @@ def open_barrier_and_signal_enter(ch, method, properties, body):
     turn_off_leds()
     time.sleep(1000)
 
+def vehicle_can_enter_obs(ch, method, properties, body):
+    print(" [x] Received %r" % body)
+
+    bod = body.decode().lower()
+
+    if bod.endswith('e'):
+        open_barrier_and_signal_enter()
+    else:
+        for i in range(5):
+            not_allowed_to_enter()
+    turn_off_leds()
+
+close_barrier()
+
 result = channel.queue_declare(queue='', exclusive=True)
 queue_name = result.method.queue
-channel.queue_bind(exchange='vehicle_can_enter', queue=queue_name)
-channel.basic_consume(queue=queue_name, auto_ack=True, on_message_callback=open_barrier_and_signal_enter)
+channel.queue_bind(exchange='plate_detected', queue=queue_name)
+channel.basic_consume(queue=queue_name, auto_ack=True, on_message_callback=vehicle_can_enter_obs)
 channel.start_consuming()
