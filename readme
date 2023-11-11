@@ -1,0 +1,14 @@
+<a name="readme-top"></a>
+
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/github_username/repo_name">
+    <img src="images/IntelliCharge.png" alt="Logo" width="80" height="80">
+  </a>
+
+<h3 align="center">IntelliCharge</h3>
+  <p align="left">
+    This project was created during the Hackathon 2023 held at NOI Techpark in Bolzano (Italy). The goal of the challenge presented by VmWare, was to maximize the experience for users of electric vehicles. It is composed of three different parts: the dashboard of the charging station, the parking spot itself and the AI used to identify the car and the user.
+  </p>
+</div>
