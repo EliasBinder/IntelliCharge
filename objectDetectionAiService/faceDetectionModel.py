@@ -1,5 +1,7 @@
 import base64
 
+import numpy as np
+
 import torch
 
 import tensorflow as tf
@@ -43,15 +45,18 @@ def detect(img_data):
         for b in dets:
             if b.score < vis_threshold:
                 continue
-            # cropped_face = img_pil.crop((b.top_left.int()[1], b.top_right.int()[0], b.bottom_right.int()[1],  b.bottom_right.int()[0]))
+
+            cropped_face = img_pil.crop(
+                (int(b.top_left[0]), int(b.top_left[1]), int(b.bottom_right[0]), int(b.bottom_right[1])))
             # Make it a square image with 48x48 pixels and make it grayscale
-            # cropped_face = cropped_face.resize((48, 48)).convert('L')
+            cropped_face = cropped_face.resize((48, 48)).convert('L')
             # Convert to gray values ranging from 0 to 255 in an array
-            # cropped_face = tf.keras.preprocessing.image.img_to_array(cropped_face)
-            # join the array to a string with space as delimiter
-            # cropped_face = ' '.join(cropped_face.flatten().astype(str))
+            cropped_face_array = np.array(cropped_face, dtype=np.uint8)
+            # Flatten the array
+            cropped_face_flat = cropped_face_array.flatten()
+            # Join the array to a string with space as delimiter
+            cropped_face_str = ' '.join(cropped_face_flat.astype(str))
             # Add the cropped face to the list of faces
-            # faces.append(cropped_face)
-            faces.append('Face detected')
+            faces.append(cropped_face_str)
 
         return faces
