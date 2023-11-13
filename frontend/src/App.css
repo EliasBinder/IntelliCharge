@@ -1,0 +1,66 @@
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.primary {
+  color: #34D399;
+}
+
+:root {
+  --clr-bg-dark: #1E293B;
+  --clr-bg-light: #F1F5F9;
+  --clr-bg-card: #354662;
+
+  --clr-text-light: #1E293B; /* gray-200 */
+  --clr-text-dark: #F1F5F9; /* zinc-50 */
+}
+
+.dark {
+  background-color: var(--clr-bg-dark);
+  color: var(--clr-text-dark);
+
+  .card {
+    background-color: var(--clr-bg-card);
+    color: var(--clr-text-dark);
+  }
+
+  .progressbar {
+    border: 2px solid var(--clr-text-dark);
+  }
+
+  .bar {
+    background: linear-gradient(270deg, #34D399 0%, #1E293B 100%);
+  }
+
+  .center-border {
+    border-left: 2px solid var(--clr-text-dark);
+    border-right: 2px solid var(--clr-text-dark);  }
+}
+
+.light {
+  background-color: var(--clr-bg-light);
+  color: var(--clr-text-light);
+   
+  .card {
+    background-color: #FFFFFF;
+    color: var(--clr-text-light);
+  }
+
+  .progressbar {
+    border: 2px solid var(--clr-text-light);
+  }
+
+  .bar {
+    background: linear-gradient(270deg, #34D399 0%, #D1FAE5 100%);
+  }
+
+  .center-border {
+    border-left: 2px solid var(--clr-text-light);
+    border-right: 2px solid var(--clr-text-light);
+  }
+}
+
+.accent {
+  background-color: #BFDBFE;
+}

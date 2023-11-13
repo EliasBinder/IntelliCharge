@@ -1,0 +1,42 @@
+.progressbar {
+    /* Size */
+    width: 700px;
+    height: 100px;
+
+    /* Content alignment */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+
+    /* Style */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.bar {
+    /* Size */
+    width: 0%;
+    background: #34D399;
+}
+
+.progressbar-container {
+    /* Content alignment */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.progressbar-text-container {
+    /* Size */
+    width: 30px;
+    margin-left: 30px;
+
+    /* Content alignment */
+    display: flex;
+    flex-direction: row;
+
+    /* Styling */
+    font-weight: bold;
+    font-size: 30px;
+}
