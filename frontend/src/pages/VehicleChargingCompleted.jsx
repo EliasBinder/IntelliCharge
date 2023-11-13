@@ -1,5 +1,5 @@
 import React from 'react';
-import Done from '../assets/Done';
+import Done from '../assets/icons/Done';
 
 export default function VehicleChargingCompleted() {
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import Close from '../assets/Close';
+import Close from '../assets/icons/Close';
 
 export default function VehicleCantEnter() {
   return (

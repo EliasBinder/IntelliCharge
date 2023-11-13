@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import PoiEntry from '../components/PoiEntry';
 import ProgressBar from '../components/ProgressBar/ProgressBar';
-import Time from '../assets/Time';
 
 export default function VehicleCharging() {
 

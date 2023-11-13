@@ -1,5 +1,5 @@
 import React from 'react';
-import Police from '../assets/Police';
+import Police from '../assets/icons/Police';
 
 export default function VehicleIsAbusive() {
   return (
