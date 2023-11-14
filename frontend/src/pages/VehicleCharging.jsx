@@ -4,7 +4,8 @@ import ProgressBar from '../components/ProgressBar/ProgressBar';
 
 export default function VehicleCharging() {
 
-    const [items, setItems] = React.useState();
+    const [items, setItems] = React.useState(null);
+    const [charge, setCharge] = React.useState(90);
     
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(position => {
@@ -21,12 +22,11 @@ export default function VehicleCharging() {
         },() => {});
     }, []);
 
-
     return (
         <div className='w-full flex flex-col items-center justify-center h-screen'>
             <div className='w-full flex flex-col items-start justify-start px-20'>
                 <div className='w-full text-center mt-20 items-center justify-center flex'>
-                    <ProgressBar value={90}/>
+                    <ProgressBar value={charge}/>
                 </div>
                 <div className='w-full h-40 card rounded-xl mt-20 justify-center items-center flex p-5'>
                     <div className='flex flex-row w-full h-full'>

@@ -4,6 +4,7 @@ import VehicleChargingCompleted from './pages/VehicleChargingCompleted';
 import VehicleEntered from './pages/VehicleEntered';
 import VehicleCantEnter from './pages/VehicleCantEnter';
 import VehicleIsAbusive from './pages/VehicleIsAbusive';
+import VehicleBlocking from './pages/VehicleBlocking';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import React from 'react';
 
@@ -36,6 +37,9 @@ export default function App() {
           } />
           <Route path="/abusive" element={
             <VehicleIsAbusive />
+          } />
+          <Route path="/blocking" element={
+            <VehicleBlocking />
           } />
         </Routes>
       </Router>
