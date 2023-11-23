@@ -6,11 +6,12 @@ export default function ProgressBar({value}) {
     const progressTextRef = useRef(null);
     useEffect(() => {
         const progressText = progressTextRef.current?.textContent;
-        if(progressText != null) {
+        if(progressText && progressTextRef.current) {
             animate(parseInt(progressText),value, {
                 duration: 2,
                 onUpdate : (cv) => {
-                    progressTextRef.current.textContent = cv.toFixed(0)
+                    if(progressTextRef.current) 
+                        progressTextRef.current.textContent = cv.toFixed(0)
                 }
             });
         }

@@ -1,32 +1,88 @@
 import React, { useEffect } from 'react';
 import PoiEntry from '../components/PoiEntry';
 import ProgressBar from '../components/ProgressBar/ProgressBar';
+import { useLocation } from 'react-router-dom';
+import useWebSocket from 'react-use-websocket';
 
 export default function VehicleCharging() {
 
+    const location = useLocation();
     const [items, setItems] = React.useState(null);
-    const [charge, setCharge] = React.useState(90);
-    
+    const [percentage_charge, setPercentage] = React.useState(0);
+    const [user_mood, setMood] = React.useState(0);
+
+    useWebSocket(
+        'ws://localhost:8080',
+        { 
+            share: true,
+            onMessage: (event) => {
+                event = JSON.parse(event.data);
+                switch (event.name) {
+                    case "charging":
+                        setPercentage(event.data.percentage);
+                        break;
+                    case "face_expression":
+                        setMood(event.data.mood);
+                        break;
+                }
+            },
+            reconnectAttempts: 1000,
+            reconnectInterval: 1000,
+            shouldReconnect: (closeEvent) => true,
+        }
+      );
+
+    function getTypeCodeByMood(mood) {
+        switch (mood) { 
+            case 1: // Disgust
+                return 32; // Gastronomy
+            case 3: // Happy
+                return 128; // Geschäfte und Dienstleister
+            case 0: // Angry
+            case 2: // Fear
+            case 4: // Sad
+                return 1; // wellness
+            case 5: // Surprise
+            case 6: // Neutral
+                return 8; //sightseeing
+        }
+    }
+
+    function getTextByMood(mood) {
+        switch (mood) {
+            case 1: // Disgust
+                return "You look disgusted. Maybe you should go eat something.";
+            case 3: // Happy
+                return "You look happy. Maybe you should go shopping.";
+            case 0: // Angry
+            case 2: // Fear
+            case 4: // Sad
+                return "You look sad. Maybe you should go to a spa.";
+            case 5: // Surprise
+            case 6: // Neutral
+                return "You look surprised. Maybe you should go sightseeing.";
+        }
+    }
+
     useEffect(() => {
+        const mood = location.state !== null ? location.state.mood : 0;
+        
         navigator.geolocation.getCurrentPosition(position => {
-            fetch('https://tourism.opendatahub.com/v1/ODHActivityPoi?type=188&latitude=' + 
-                position.coords.latitude + 
-                '&longitude=' + position.coords.longitude + 
-                '&removenullvalues=false'
-            )
+            fetch("https://tourism.opendatahub.com/v1/ODHActivityPoi?pagenumber=1&type=" + getTypeCodeByMood(mood) + "&latitude=46.4982039&longitude=11.350665&removenullvalues=false")
             .then(res => res.json())
             .then((data) => {
                 setItems(data);
             })
             .catch(console.log)
         },() => {});
-    }, []);
+    }, [])
+
 
     return (
         <div className='w-full flex flex-col items-center justify-center h-screen'>
             <div className='w-full flex flex-col items-start justify-start px-20'>
                 <div className='w-full text-center mt-20 items-center justify-center flex'>
-                    <ProgressBar value={charge}/>
+                    <ProgressBar value={percentage_charge}/>
                 </div>
                 <div className='w-full h-40 card rounded-xl mt-20 justify-center items-center flex p-5'>
                     <div className='flex flex-row w-full h-full'>
@@ -58,7 +114,7 @@ export default function VehicleCharging() {
                     Don't know what to do now?
                 </div>
                 <div className='w-full text-3xl'>
-                    Here are some places you can visit in the meantime
+                    {getTextByMood(user_mood)}
                 </div>
             </div>
 
