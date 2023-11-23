@@ -5,6 +5,7 @@ import VehicleEntered from './pages/VehicleEntered';
 import VehicleCantEnter from './pages/VehicleCantEnter';
 import VehicleIsAbusive from './pages/VehicleIsAbusive';
 import VehicleBlocking from './pages/VehicleBlocking';
+import VehicleEntering from './pages/VehicleEntering';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import React from 'react';
 import useWebSocket from 'react-use-websocket';
@@ -22,10 +23,7 @@ export default function App() {
           switch (event.name) {
             case "plate_detected":
               const isElectric = event.plate.toLowerCase().endsWith('e');
-              if (isElectric) {
-                console.log("Plate detected: ", event.plate);
-                navigate('/');
-              } else {
+              if (!isElectric) {
                 console.log("Plate detected: ", event.plate);
                 navigate('/cant_enter');
               }
@@ -44,8 +42,11 @@ export default function App() {
             case "charging_completed":
               navigate('/completed');
               break;
-            case "vehicle_abusice":
+            case "vehicle_abusive":
               navigate('/abusive');
+              break;
+            case "vehicle_entering":
+              navigate('/entering');
               break;
           }
         },
@@ -75,6 +76,9 @@ export default function App() {
         } />
         <Route path="/blocking" element={
           <VehicleBlocking />
+        } />
+        <Route path="/entering" element={
+          <VehicleEntering />
         } />
       </Routes>
     </div>
