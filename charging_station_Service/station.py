@@ -4,6 +4,7 @@ import neopixel
 from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import AngularServo
 import pika
+import json
 
 NUM_PIXELS = 17
 
@@ -13,7 +14,7 @@ servo = AngularServo(17, min_angle=-90, max_angle=90, pin_factory=factory)
 credentials = pika.PlainCredentials('admin', 'admin')
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.94.1', credentials=credentials))
 channel = connection.channel()
-channel.exchange_declare(exchange='plate_detected', exchange_type='fanout')
+channel.exchange_declare(exchange='events', exchange_type='fanout')
 
 def enter_spot():
     for i in range(NUM_PIXELS - 4 + 1):
@@ -59,29 +60,29 @@ def close_barrier():
     servo.angle = -90
 
 def signal_charging(percentage):
-    channel.queue_declare(queue='charging')
+    channel.queue_declare(queue='events')
     time.sleep(1)
-    channel.basic_publish(exchange='', routing_key='charging', body='{"name": "charging_started", "data": {"percentage": ' + percentage + '}}')
+    channel.basic_publish(exchange='', routing_key='events', body='{"name": "charging_started", "data": {"percentage": ' + percentage + '}}')
 
 def singal_charging_done():
-    channel.queue_declare(queue='charging_done')
+    channel.queue_declare(queue='events')
     time.sleep(1)
-    channel.basic_publish(exchange='', routing_key='charging_done', body='{"name": "charging_done", "data": {}')
+    channel.basic_publish(exchange='', routing_key='events', body='{"name": "charging_done", "data": {}')
 
 def signal_vehicle_abusive():
-    channel.queue_declare(queue='vehicle_abusive')
+    channel.queue_declare(queue='events')
     time.sleep(1)
-    channel.basic_publish(exchange='', routing_key='vehicle_abusive', body='Charging is done and vehicle is stationary for too long.')
+    channel.basic_publish(exchange='', routing_key='events', body='{"name": "vehicle_abusive", "data": {}}')
 
 def signal_charging_started():
-    channel.queue_declare(queue='charging_started')
+    channel.queue_declare(queue='events')
     time.sleep(1)
-    channel.basic_publish(exchange='', routing_key='charging_started', body='{"name": "charging_started", "data": {}}')
+    channel.basic_publish(exchange='', routing_key='events', body='{"name": "charging_started", "data": {}}')
 
 def signal_vehicle_entering():
-    channel.queue_declare(queue='vehicle_entering')
+    channel.queue_declare(queue='events')
     time.sleep(1)
-    channel.basic_publish(exchange='', routing_key='vehicle_entering', body='{"name": "vehicle_entering", "data": {}}')
+    channel.basic_publish(exchange='', routing_key='events', body='{"name": "vehicle_entering", "data": {}}')
 
 def open_barrier_and_signal_enter():
     open_barrier()
@@ -114,21 +115,25 @@ def open_barrier_and_signal_enter():
 def vehicle_can_enter_obs(ch, method, properties, body):
     print(" [x] Received %r" % body)
 
-    bod = body.decode().lower()
+    bod = body.decode()
 
-    if bod.endswith('e'):
-        signal_vehicle_entering()
-        open_barrier_and_signal_enter()
-    else:
-        signal_vehicle_abusive()
-        for i in range(5):
-            not_allowed_to_enter()
-    turn_off_leds()
+    name = json.loads(bod)['name']
+    data = json.loads(bod)['data']
+
+    if name == 'plate_detected':
+        if data.plate.endswith('e'):
+            signal_vehicle_entering()
+            open_barrier_and_signal_enter()
+        else:
+            signal_vehicle_abusive()
+            for i in range(5):
+                not_allowed_to_enter()
+        turn_off_leds()
 
 close_barrier()
 
 result = channel.queue_declare(queue='', exclusive=True)
 queue_name = result.method.queue
-channel.queue_bind(exchange='plate_detected', queue=queue_name)
+channel.queue_bind(exchange='events', queue=queue_name)
 channel.basic_consume(queue=queue_name, auto_ack=True, on_message_callback=vehicle_can_enter_obs)
 channel.start_consuming()
