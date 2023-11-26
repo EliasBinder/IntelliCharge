@@ -1,0 +1,6 @@
+[submodule "PaddleOCR"]
+	path = licensePlateDetectionAiService/PaddleOCR
+	url = https://github.com/PaddlePaddle/PaddleOCR
+[submodule "licensePlateDetectionAiService/PaddleOCR"]
+	path = licensePlateDetectionAiService/PaddleOCR
+	url = https://github.com/PaddlePaddle/PaddleOCR
