@@ -1,11 +1,11 @@
 version: '3'
 services:
-  rabbitmq:
+  rabbitmqhackathon:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmqhackathon'
     restart: unless-stopped
     command: "/bin/bash -c \"rabbitmq-plugins enable --offline rabbitmq_mqtt rabbitmq_web_mqtt rabbitmq_amqp1_0; rabbitmq-server\""
-    hostname: 'rabbitmq'
+    hostname: 'rabbitmqhackathon'
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
@@ -17,3 +17,28 @@ services:
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
+  object-detection-service:
+    build: ./objectDetectionAiService
+    restart: on-failure
+    depends_on:
+      - rabbitmqhackathon
+  facial-expression-service:
+    build: ./facialExpressionAiService
+    restart: on-failure
+    depends_on:
+      - rabbitmqhackathon
+  image-retriever-service:
+    build: ./imageRetrieverService
+    restart: on-failure
+    ports:
+      - "4000:4000"
+    depends_on:
+      - rabbitmqhackathon
+  frontend-service:
+    build: ./frontendService
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rabbitmqhackathon
