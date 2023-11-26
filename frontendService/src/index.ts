@@ -19,7 +19,7 @@ const app = new Elysia()
     })
     .get("/", index)
     .get("*", frontend)
-    .listen(3001);
+    .listen(3000);
 
 export const rabbit = rabbitConfig
 

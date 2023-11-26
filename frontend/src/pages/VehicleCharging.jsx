@@ -12,7 +12,7 @@ export default function VehicleCharging() {
     const [user_mood, setMood] = React.useState(0);
 
     useWebSocket(
-        'ws://localhost:8080',
+        'ws://localhost:3000/update',
         { 
             share: true,
             onMessage: (event) => {

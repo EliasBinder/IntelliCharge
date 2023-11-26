@@ -15,7 +15,7 @@ export default function App() {
   const navigate = useNavigate();
 
   useWebSocket(
-    'ws://localhost:3001/update',
+    'ws://localhost:3000/update',
     { 
         share: true,
         onMessage: (event) => {
