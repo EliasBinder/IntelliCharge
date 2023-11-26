@@ -150,18 +150,27 @@ def detect_plate(img, det_model=DET_MODEL, cls_model=CLS_MODEL, rec_model=REC_MO
 credentials = pika.PlainCredentials('admin', 'admin')
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.94.1', credentials=credentials))
 channel = connection.channel()
-channel.exchange_declare(exchange='images', exchange_type='fanout')
+channel.exchange_declare(exchange='images_car', exchange_type='fanout')
 result = channel.queue_declare(queue='', exclusive=True)
 queue_name = result.method.queue
-channel.queue_bind(exchange='images', queue=queue_name)
+channel.queue_bind(exchange='images_car', queue=queue_name)
+
+detected_plate = None
 
 def on_new_image(ch, method, props, body):
     results = detect_plate(body)
     if not results or len(results[0][0]) != 7:
+        detect_plate = None
         return
     plate = results[0][0]
-    channel.exchange_declare(exchange="plate_detected", exchange_type="fanout")
-    channel.basic_publish(exchange="plate_detected", routing_key="plate_detected", body=plate)
+    if detected_plate == plate:
+        return
+    channel.exchange_declare(exchange="events", exchange_type="fanout")
+    event = {
+        "name": "plate_detected",
+        "plate": plate
+    }
+    channel.basic_publish(exchange="", routing_key="events", body=json.dumps(event).encode("utf-8"))
 
 channel.basic_consume(queue_name, on_new_image, True)
 channel.start_consuming()
