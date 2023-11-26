@@ -1,6 +1,7 @@
 import {Elysia} from "elysia";
 import {frontend} from "./functions/frontend";
 import {rabbitConfig} from "./rabbit/rabbitUtil";
+import {index} from "./functions";
 
 let clients: any = [];
 
@@ -16,6 +17,7 @@ const app = new Elysia()
             clients = clients.filter((client: any) => client !== ws);
         }
     })
+    .get("/", index)
     .get("*", frontend)
     .listen(3001);
 
