@@ -15,7 +15,7 @@ export default function App() {
   const navigate = useNavigate();
 
   useWebSocket(
-    'ws://localhost:8080',
+    'ws://localhost:3001/update',
     { 
         share: true,
         onMessage: (event) => {
@@ -52,7 +52,7 @@ export default function App() {
         },
         reconnectAttempts: 1000,
         reconnectInterval: 1000,
-        shouldReconnect: (closeEvent) => true,
+        shouldReconnect: () => true,
     }
   );
 
