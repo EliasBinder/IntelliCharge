@@ -22,7 +22,7 @@ export default function VehicleCharging() {
                         setPercentage(event.data.percentage);
                         break;
                     case "face_expression":
-                        setMood(event.data.mood);
+                        setMood(event.mood);
                         break;
                 }
             },

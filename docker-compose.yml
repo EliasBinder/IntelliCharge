@@ -47,3 +47,10 @@ services:
       - "3000:3000"
     depends_on:
       - rabbitmqhackathon
+  debug-service:
+    build: ./debugService
+    restart: on-failure
+    ports:
+      - "3001:3001"
+    depends_on:
+      - rabbitmqhackathon

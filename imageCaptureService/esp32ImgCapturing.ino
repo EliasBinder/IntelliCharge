@@ -137,5 +137,5 @@ void setup() {
 
 void loop() {
   captureAndPublish();
-  delay(5000);
+  delay(15000);
 }

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debugger</title>
+</head>
+<body>
+    <img id="esp32img" style="width: 100%" alt="Esp32Img" />
+
+    <script>
+        const socket = new WebSocket('ws://localhost:3001/update');
+        socket.addEventListener('message', function (event) {
+            const img = document.getElementById('esp32img');
+            img.src = 'data:image/jpeg;base64,' + event.data;
+        });
+    </script>
+</body>
+</html>

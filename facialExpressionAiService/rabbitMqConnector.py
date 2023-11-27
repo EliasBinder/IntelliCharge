@@ -7,7 +7,7 @@ import pika
 from aiRunner import predict
 
 credentials = pika.PlainCredentials('admin', 'admin')
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmqhackathon', credentials=credentials))
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost', credentials=credentials))
 channel = connection.channel()
 channel.queue_declare(queue='images_face')
 channel.queue_declare(queue='events')
@@ -20,7 +20,7 @@ def callback(ch, method, props, body):
     print(prediction)
     event = {
         'name': 'face_expression',
-        'data': int(prediction)
+        'mood': int(prediction)
     }
     channel.basic_publish(exchange='', routing_key='events', body=json.dumps(event, indent=4).encode('utf-8'))
 

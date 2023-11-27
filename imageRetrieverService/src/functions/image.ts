@@ -16,7 +16,10 @@ export const image = async (context: Context) => {
 
     console.log('Sending to RabbitMQ: ' + base64);
 
-    rabbitConfig.sendToQueue('images', Buffer.from(base64));
+    const base64Image = Buffer.from(base64);
+
+    rabbitConfig.sendToQueue('images', base64Image);
+    rabbitConfig.sendToQueue('debug_images', base64Image);
 
     return 'Image sent to RabbitMQ';
 }

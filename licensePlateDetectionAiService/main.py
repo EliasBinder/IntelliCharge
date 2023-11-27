@@ -151,18 +151,19 @@ credentials = pika.PlainCredentials('admin', 'admin')
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmqhackathon', credentials=credentials))
 channel = connection.channel()
 channel.exchange_declare(exchange='images_car', exchange_type='fanout')
-result = channel.queue_declare(queue='', exclusive=True)
+result = channel.queue_declare(queue='images_car')
 queue_name = result.method.queue
 channel.queue_bind(exchange='images_car', queue=queue_name)
 
-detected_plate = None
+detected_plate = ""
 
 def on_new_image(ch, method, props, body):
     results = detect_plate(body)
     if not results or len(results[0][0]) != 7:
-        detect_plate = None
+        detected_plate = ""
         return
     plate = results[0][0]
+    print('Plate detected: ' + plate)
     if detected_plate == plate:
         return
     channel.exchange_declare(exchange="events", exchange_type="fanout")

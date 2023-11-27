@@ -28,9 +28,9 @@ def callback(ch, method, props, body):
         print(json.dumps(event))
         channel.basic_publish(exchange='', routing_key='events', body=json.dumps(event).encode('utf-8'))
         # if predictionObject includes a car, send the image to the license plate detection service
-        for object in predictionObject:
-            if object == 'car':
-                channel.basic_publish(exchange='', routing_key='images_car', body=body)
+        # for object in predictionObject:
+        #     if object == 'car':
+        channel.basic_publish(exchange='', routing_key='images_car', body=body)
     if predictionFace is not None:
         for face in predictionFace:
             channel.basic_publish(exchange='', routing_key='images_face', body=face)
