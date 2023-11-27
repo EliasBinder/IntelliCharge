@@ -18,13 +18,18 @@ services:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
 
-  object-detection-service:
-    build: ./objectDetectionAiService
-    restart: on-failure
-    depends_on:
-      - rabbitmqhackathon
-  facial-expression-service:
-    build: ./facialExpressionAiService
+  # object-detection-service:
+  #   build: ./objectDetectionAiService
+  #   restart: on-failure
+  #   depends_on:
+  #     - rabbitmqhackathon
+  # facial-expression-service:
+  #   build: ./facialExpressionAiService
+  #   restart: on-failure
+  #   depends_on:
+  #     - rabbitmqhackathon
+  license-plate-service:
+    build: ./licensePlateDetectionAiService
     restart: on-failure
     depends_on:
       - rabbitmqhackathon

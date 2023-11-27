@@ -148,7 +148,7 @@ def detect_plate(img, det_model=DET_MODEL, cls_model=CLS_MODEL, rec_model=REC_MO
     return [(text, score) for text, score in rec_res]
 
 credentials = pika.PlainCredentials('admin', 'admin')
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.94.1', credentials=credentials))
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmqhackathon', credentials=credentials))
 channel = connection.channel()
 channel.exchange_declare(exchange='images_car', exchange_type='fanout')
 result = channel.queue_declare(queue='', exclusive=True)
