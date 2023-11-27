@@ -140,25 +140,26 @@ def detect_plate(img, det_model=DET_MODEL, cls_model=CLS_MODEL, rec_model=REC_MO
     img = cv2.cvtColor(np.array(Image.open(io.BytesIO(base64.b64decode(img)))), cv2.COLOR_BGR2RGB)
     dt_boxes, rec_res, time_dict = text_sys(img)
 
-    # res = [{
-    #     "transcription": rec_res[i][0],
-    #     "points": np.array(dt_boxes[i]).astype(np.int32).tolist(),
-    # } for i in range(len(dt_boxes))]
+    res = [{
+        "transcription": rec_res[i][0],
+        "points": np.array(dt_boxes[i]).astype(np.int32).tolist(),
+    } for i in range(len(dt_boxes))]
+    print(res)
 
     return [(text, score) for text, score in rec_res]
 
 credentials = pika.PlainCredentials('admin', 'admin')
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmqhackathon', credentials=credentials))
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost', credentials=credentials))
 channel = connection.channel()
-channel.exchange_declare(exchange='images_car', exchange_type='fanout')
 result = channel.queue_declare(queue='images_car')
-queue_name = result.method.queue
-channel.queue_bind(exchange='images_car', queue=queue_name)
 
 detected_plate = ""
 
 def on_new_image(ch, method, props, body):
+    print(" [x] Received %r" % body)
     results = detect_plate(body)
+    print("results")
+    print(results)
     if not results or len(results[0][0]) != 7:
         detected_plate = ""
         return
@@ -173,5 +174,5 @@ def on_new_image(ch, method, props, body):
     }
     channel.basic_publish(exchange="", routing_key="events", body=json.dumps(event).encode("utf-8"))
 
-channel.basic_consume(queue_name, on_new_image, True)
+channel.basic_consume('images_car', on_new_image, True)
 channel.start_consuming()

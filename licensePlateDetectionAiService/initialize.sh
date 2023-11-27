@@ -1,7 +1,7 @@
 #!/bin/bash
 
-python3.11 -m pip install -r PaddleOCR/requirements.txt
-python3.11 -m pip install -r requirements.txt
+python3.9 -m pip install -r PaddleOCR/requirements.txt
+python3.9 -m pip install -r requirements.txt
 
 cd PaddleOCR || exit
 mkdir -p inference/cls inference/det inference/reg
